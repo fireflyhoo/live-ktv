@@ -1,0 +1,12 @@
+{
+  "name": "danmaku-disco",
+  "version": "0.1.0",
+  "description": "直播弹幕驱动的像素风蹦迪舞台，每条评论上台一个小人",
+  "private": true,
+  "scripts": {
+    "start": "node server/bridge.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

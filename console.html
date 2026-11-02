@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>弹幕蹦迪舞台 · 控制台</title>
+<link rel="stylesheet" href="css/stage.css">
+<link rel="stylesheet" href="css/console.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- 左：舞台实时预览（就是舞台页本尊，同源嵌入） -->
+  <section class="preview-col">
+    <div class="preview-head">
+      <span class="dot" id="live-dot"></span>
+      <b>舞台预览</b>
+      <span class="sub" id="live-state">未连接</span>
+      <button id="btn-open" class="mini">打开舞台窗口</button>
+    </div>
+    <div class="preview-box" id="preview-box">
+      <iframe id="preview" src="/?preview=1" title="舞台预览"></iframe>
+    </div>
+    <div class="obs-url">
+      <span>OBS 浏览器源地址</span>
+      <code id="obs-url">http://127.0.0.1:8787/?mode=transparent</code>
+      <button id="btn-copy" class="mini">复制</button>
+    </div>
+  </section>
+
+  <!-- 右：控制台 -->
+  <section id="panel" class="console-panel">
+    <div class="panel-head">
+      <span class="panel-title">🎧 弹幕蹦迪舞台 · 控制台</span>
+    </div>
+
+    <div class="panel-body">
+      <div class="row">
+        <label>舞台规格</label>
+        <div class="seg" id="seg-ratio">
+          <button data-ratio="wide" class="on">PC 横版 16:9</button>
+          <button data-ratio="vertical">手机竖版 9:16</button>
+        </div>
+        <p class="note" id="ratio-note">1920×1080 横屏，适合 OBS 采集 / 大屏</p>
+      </div>
+
+      <div class="row">
+        <label>显示模式</label>
+        <div class="seg" id="seg-mode">
+          <button data-mode="stage" class="on">完整舞台</button>
+          <button data-mode="transparent">透明叠加</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label>弹幕来源</label>
+        <div class="seg" id="seg-source">
+          <button data-src="sim" class="on">模拟器</button>
+          <button data-src="live">外部接入</button>
+        </div>
+        <p class="note" id="src-note">本地模拟，用来看效果</p>
+      </div>
+
+      <div class="row" id="row-rate">
+        <label>模拟节奏 <span class="val" id="val-rate">每秒 0.8 条</span></label>
+        <input type="range" id="rng-rate" min="1" max="20" value="8">
+      </div>
+
+      <div class="row">
+        <label>同屏上限 <span class="val" id="val-max">30</span></label>
+        <input type="range" id="rng-max" min="5" max="80" value="30">
+      </div>
+
+      <div class="row">
+        <label>手动投喂 <span class="val">昵称: 内容</span></label>
+        <input type="text" id="inp-manual" placeholder="小明: 主播好帅 😍">
+      </div>
+
+      <div class="row stats">
+        <div><span id="stat-live">—</span><small>在场</small></div>
+        <div><span id="stat-total">—</span><small>累计</small></div>
+        <div><span id="stat-conn">—</span><small>连接</small></div>
+      </div>
+
+      <div class="row btns">
+        <button id="btn-clear">清场</button>
+        <button id="btn-burst">来一波</button>
+      </div>
+
+      <details class="help">
+        <summary>接入真实平台弹幕</summary>
+        <div class="help-body">
+          <p>舞台开着一个本地服务，几种方式都能把弹幕送进来：</p>
+          <ol>
+            <li><b>HTTP 单条</b><br><code>POST http://127.0.0.1:8787/danmaku</code><br><code>{"user":"昵称","text":"内容","emote":"😍"}</code></li>
+            <li><b>WS</b><br><code>ws://127.0.0.1:8787</code> 直接推同结构 JSON</li>
+            <li><b>postMessage</b><br><code>postMessage({type:'danmaku',...},'*')</code></li>
+            <li><b>视频号整包（推荐抓取脚本用）</b><br><code>POST http://127.0.0.1:8787/video-channel-live</code><br>把 <code>{type:'video_channel_live', comments:[...], viewers:[...]}</code> 原样发过来，服务端拆包、跨批次去重、同名合并。支持跨域。</li>
+          </ol>
+          <p class="tip">整包接口返回 <code>{"ok":true,"accepted":N,"duplicates":M,"viewersOnStage":K}</code>，连推同一份快照不会重复生成小人。<b>观众榜默认也上台</b>（只有名字不弹气泡），前三名给 VIP 名牌；不要就加 <code>?includeViewers=0</code>，要调人数用 <code>?maxViewers=50</code>。</p>
+          <p class="tip">推了什么、谁上台了、谁被判为重复，都直接打印在<b>跑服务那个终端</b>里，不用回浏览器看。</p>
+          <p class="tip">B 站可在服务端直连；抖音 / 视频号用抓取脚本转发到上面任一入口。详见 README。</p>
+        </div>
+      </details>
+
+      <div class="foot">
+        舞台本身不带任何 UI，方便 OBS 直接采集。<br>
+        这个控制台和舞台之间走同源广播，改什么都是即时生效。
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/danmaku.js"></script>
+<script src="js/link.js"></script>
+<script src="js/console.js"></script>
+</body>
+</html>
